@@ -1,0 +1,59 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id              String     @id @default(uuid())
+  name            String
+  email           String     @unique
+  preferences     String     @default("{}") // JSON string for preferences
+  pantry          Pantry?
+  mealPlans       MealPlan[]
+  favoriteRecipes Recipe[]
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @updatedAt
+}
+
+model Pantry {
+  id          String   @id @default(uuid())
+  userId      String   @unique
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  ingredients String   @default("[]") // JSON string of Ingredient[]
+  updatedAt   DateTime @updatedAt
+}
+
+model Recipe {
+  id           String   @id @default(uuid())
+  title        String
+  cuisine      String
+  cookingTime  Int      // in minutes
+  ingredients  String   @default("[]") // JSON string of Ingredient[]
+  instructions String   @default("[]") // JSON string of string[]
+  nutrition    String   @default("{}") // JSON string of Nutrition
+  tags         String   @default("[]") // JSON string of string[]
+  users        User[]
+  createdAt    DateTime @default(now())
+}
+
+model MealPlan {
+  id            String   @id @default(uuid())
+  userId        String
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  weekStartDate String   // e.g. "2026-06-08"
+  plan          String   @default("{}") // JSON string of Plan details
+  budgetLimit   Float    @default(0.0)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@unique([userId, weekStartDate])
+}
+
