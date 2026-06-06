@@ -14,7 +14,7 @@ export async function GET() {
     });
 
     // Parse JSON strings back to structures
-    const parsedFavorites = favorites.map((rec) => ({
+    const parsedFavorites = favorites.map((rec: any) => ({
       ...rec,
       ingredients: JSON.parse(rec.ingredients),
       instructions: JSON.parse(rec.instructions),
